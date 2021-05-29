@@ -7,7 +7,6 @@
 #include "wavtable.h"
 
 #pragma code_seg("PAGE")
-
 // Create the wavecyclic miniport.
 NTSTATUS CreateMiniportWaveCyclic(OUT PUNKNOWN * Unknown, IN  REFCLSID,
                IN PUNKNOWN UnknownOuter OPTIONAL, IN POOL_TYPE PoolType)
@@ -18,7 +17,7 @@ NTSTATUS CreateMiniportWaveCyclic(OUT PUNKNOWN * Unknown, IN  REFCLSID,
   STD_CREATE_BODY(CMiniportWaveCyclic, Unknown, UnknownOuter, PoolType);
 }
 
-CMiniportWaveCyclic::CMiniportWaveCyclic(PUNKNOWN pUnknownOuter):CUnknown( pUnknownOuter )
+CMiniportWaveCyclic::CMiniportWaveCyclic(PUNKNOWN pUnknownOuter): CUnknown(pUnknownOuter)
 {
 	PAGED_CODE();
 	////
@@ -238,28 +237,17 @@ STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::GetDescription(OUT PPCFILTER_DESCRI
    return (STATUS_SUCCESS);
 }
 
-//=============================================================================
-STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::Init( 
-  IN  PUNKNOWN                UnknownAdapter_,
-  IN  PRESOURCELIST           ResourceList_,
-  IN  PPORTWAVECYCLIC         Port_ 
-)
-/*
-Routine Description:
-  The Init function initializes the miniport. Callers of this function 
-  should run at IRQL PASSIVE_LEVEL
+/*  The Init function initializes the miniport. Callers of this function
+    should run at IRQL PASSIVE_LEVEL
 
-Arguments:
-  UnknownAdapter - A pointer to the Iuknown interface of the adapter object. 
-  ResourceList - Pointer to the resource list to be supplied to the miniport 
-                 during initialization. The port driver is free to examine the 
-                 contents of the ResourceList. The port driver will not be 
-                 modify the ResourceList contents. 
-  Port - Pointer to the topology port object that is linked with this miniport. 
-
-Return Value:
-  NT status code.
-*/
+    Arguments:  UnknownAdapter - A pointer to the Iuknown interface of the adapter object.
+                ResourceList - Pointer to the resource list to be supplied to the miniport
+                               during initialization. The port driver is free to examine the
+                               contents of the ResourceList. The port driver will not be
+                               modify the ResourceList contents.
+                Port - Pointer to the topology port object that is linked with this miniport. */
+STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::Init(IN PUNKNOWN UnknownAdapter_, IN PRESOURCELIST ResourceList_,
+  IN  PPORTWAVECYCLIC Port_ )
 {
   UNREFERENCED_PARAMETER(ResourceList_);
   PAGED_CODE();
@@ -310,7 +298,6 @@ Return Value:
     }
   }
   
-////
 	if (NT_SUCCESS(ntStatus))
 	{
 		KeInitializeSpinLock( &spin_lock );
@@ -328,7 +315,8 @@ Return Value:
 		}
 	}
 	 
-  if (!NT_SUCCESS(ntStatus)) {
+  if (!NT_SUCCESS(ntStatus))
+  {
     // clean up AdapterCommon
     if (m_AdapterCommon) {
       // clean up the service group
@@ -358,36 +346,13 @@ Return Value:
   return ntStatus;
 } // Init
 
-//=============================================================================
+/*  The NewStream function creates a new instance of a logical stream
+  associated with a specified physical channel. Callers of NewStream should
+  run at IRQL PASSIVE_LEVEL. */
 STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::NewStream( 
-  OUT PMINIPORTWAVECYCLICSTREAM * OutStream,
-  IN  PUNKNOWN                OuterUnknown,
-  IN  POOL_TYPE               PoolType,
-  IN  ULONG                   Pin,
-  IN  BOOLEAN                 Capture,
-  IN  PKSDATAFORMAT           DataFormat,
-  OUT PDMACHANNEL *           OutDmaChannel,
-  OUT PSERVICEGROUP *         OutServiceGroup 
-)
-/*
-Routine Description:
-  The NewStream function creates a new instance of a logical stream 
-  associated with a specified physical channel. Callers of NewStream should 
-  run at IRQL PASSIVE_LEVEL.
-
-Arguments:
-  OutStream -
-  OuterUnknown -
-  PoolType - 
-  Pin - 
-  Capture - 
-  DataFormat -
-  OutDmaChannel -
-  OutServiceGroup -
-
-Return Value:
-  NT status code.
-*/
+  OUT PMINIPORTWAVECYCLICSTREAM * OutStream, IN PUNKNOWN OuterUnknown,
+  IN POOL_TYPE PoolType, IN ULONG Pin, IN BOOLEAN Capture, IN  PKSDATAFORMAT DataFormat,
+  OUT PDMACHANNEL * OutDmaChannel, OUT PSERVICEGROUP * OutServiceGroup)
 {
   UNREFERENCED_PARAMETER(PoolType);
   PAGED_CODE();
@@ -403,39 +368,53 @@ Return Value:
   PCMiniportWaveCyclicStream  stream = NULL;
 
   // Check if we have enough streams.
-  if (Capture) {
-    if (m_fCaptureAllocated) {
+  if (Capture) 
+  {
+    if (m_fCaptureAllocated)
+    {
       //DPF(D_TERSE, ("[Only one capture stream supported]"));
       ntStatus = STATUS_INSUFFICIENT_RESOURCES;
     }
-  } else {
-    if (m_fRenderAllocated) {
+  } 
+  else 
+  {
+    if (m_fRenderAllocated)
+    {
       //DPF(D_TERSE, ("[Only one render stream supported]"));
       ntStatus = STATUS_INSUFFICIENT_RESOURCES;
     }
   }
 
   // Determine if the format is valid.
-  if (NT_SUCCESS(ntStatus)) {
+  if (NT_SUCCESS(ntStatus))
+  {
     ntStatus = ValidateFormat(DataFormat);
   }
 
   // Instantiate a stream. Stream must be in
   // NonPagedPool because of file saving.
-  if (NT_SUCCESS(ntStatus)) {
+  if (NT_SUCCESS(ntStatus))
+  {
     stream = new (NonPagedPool, SONICSAUDIO_POOLTAG) CMiniportWaveCyclicStream(OuterUnknown);
-    if (stream) {
+    if (stream) 
+    {
       stream->AddRef();
       ntStatus = stream->Init(this, Pin, Capture, DataFormat);
-    } else {
+    }
+    else
+    {
       ntStatus = STATUS_INSUFFICIENT_RESOURCES;
     }
   }
 
-  if (NT_SUCCESS(ntStatus)) {
-    if (Capture) {
+  if (NT_SUCCESS(ntStatus))
+  {
+    if (Capture)
+    {
       m_fCaptureAllocated = TRUE;
-    } else {
+    }
+    else
+    {
       m_fRenderAllocated = TRUE;
     }
 
@@ -459,39 +438,35 @@ Return Value:
     stream->Release();
 
   return ntStatus;
-} // NewStream
+}
 
-//=============================================================================
+/*  QueryInterface
+    Arguments: Interface - GUID
+               Object - interface pointer to be returned. */
 STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::NonDelegatingQueryInterface( 
-  IN  REFIID  Interface,
-  OUT PVOID * Object 
-)
-/*
-Routine Description:
-  QueryInterface
-
-Arguments:
-  Interface - GUID
-  Object - interface pointer to be returned.
-
-Return Value:
-  NT status code.
-*/
+  IN  REFIID  Interface,  OUT PVOID * Object )
 {
   PAGED_CODE();
   ASSERT(Object);
 
   if (IsEqualGUIDAligned(Interface, IID_IUnknown)) {
     *Object = PVOID(PUNKNOWN(PMINIPORTWAVECYCLIC(this)));
-  } else if (IsEqualGUIDAligned(Interface, IID_IMiniport)) {
+  }
+  else if (IsEqualGUIDAligned(Interface, IID_IMiniport))
+  {
     *Object = PVOID(PMINIPORT(this));
-  } else if (IsEqualGUIDAligned(Interface, IID_IMiniportWaveCyclic)) {
+  }
+  else if (IsEqualGUIDAligned(Interface, IID_IMiniportWaveCyclic))
+  {
     *Object = PVOID(PMINIPORTWAVECYCLIC(this));
-  } else {
+  }
+  else
+  {
     *Object = NULL;
   }
 
-  if (*Object) {
+  if (*Object)
+  {
     // We reference the interface for the caller.
     PUNKNOWN(*Object)->AddRef();
     return STATUS_SUCCESS;
@@ -574,24 +549,9 @@ Return Value:
 } // PropertyHandler_WaveFilter
 #endif
 
-//=============================================================================
-NTSTATUS                    
-CMiniportWaveCyclic::PropertyHandlerChannelConfig(IN  PPCPROPERTY_REQUEST PropertyRequest)
-/*++
-
-Routine Description:
-
-  Handles the KSPROPERTY_AUDIO_CHANNEL_CONFIG property requests.
-
-Arguments:
-
-  PropertyRequest - property request structure
-
-Return Value:
-
-  NT status code.
-
---*/
+/* Handles the KSPROPERTY_AUDIO_CHANNEL_CONFIG property requests.
+   Arguments: PropertyRequest - property request structure -*/
+NTSTATUS CMiniportWaveCyclic::PropertyHandlerChannelConfig(IN  PPCPROPERTY_REQUEST PropertyRequest)
 {
     PAGED_CODE();
 
@@ -683,22 +643,11 @@ Return Value:
     }
     
     return ntStatus;
-} // PropertyHandlerChannelConfig
+}
 
-//=============================================================================
-NTSTATUS CMiniportWaveCyclic::PropertyHandlerCpuResources(
-  IN  PPCPROPERTY_REQUEST     PropertyRequest
-)
-/*
-Routine Description:
-  Processes KSPROPERTY_AUDIO_CPURESOURCES
-
-Arguments:
-  PropertyRequest - property request structure
-
-Return Value:
-  NT status code.
-*/
+/*  Routine Description: Processes KSPROPERTY_AUDIO_CPURESOURCES
+    Arguments:  PropertyRequest - property request structure */
+NTSTATUS CMiniportWaveCyclic::PropertyHandlerCpuResources(IN  PPCPROPERTY_REQUEST PropertyRequest)
 {
   PAGED_CODE();
   ASSERT(PropertyRequest);
@@ -706,34 +655,27 @@ Return Value:
 
   NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
 
-  if (PropertyRequest->Verb & KSPROPERTY_TYPE_GET) {
+  if (PropertyRequest->Verb & KSPROPERTY_TYPE_GET)
+  {
     ntStatus = ValidatePropertyParams(PropertyRequest, sizeof(LONG), 0);
-    if (NT_SUCCESS(ntStatus))  {
+    if (NT_SUCCESS(ntStatus))
+    {
       *(PLONG(PropertyRequest->Value)) = KSAUDIO_CPU_RESOURCES_NOT_HOST_CPU;
       PropertyRequest->ValueSize = sizeof(LONG);
       ntStatus = STATUS_SUCCESS;
     }
-  } else if (PropertyRequest->Verb & KSPROPERTY_TYPE_BASICSUPPORT) {
+  } 
+  else if (PropertyRequest->Verb & KSPROPERTY_TYPE_BASICSUPPORT)
+  {
       ntStatus =PropertyHandler_BasicSupport(PropertyRequest, KSPROPERTY_TYPE_GET | KSPROPERTY_TYPE_BASICSUPPORT, VT_I4);
   }
 
   return ntStatus;
-} // PropertyHandlerCpuResources
+}
 
-//=============================================================================
-NTSTATUS CMiniportWaveCyclic::PropertyHandlerGeneric(
-  IN  PPCPROPERTY_REQUEST     PropertyRequest
-)
-/*
-Routine Description:
-  Handles all properties for this miniport.
-
-Arguments:
-  PropertyRequest - property request structure
-
-Return Value:
-  NT status code.
-*/
+/* Handles all properties for this miniport.
+Arguments:  PropertyRequest - property request structure */
+NTSTATUS CMiniportWaveCyclic::PropertyHandlerGeneric(IN  PPCPROPERTY_REQUEST PropertyRequest)
 {
   PAGED_CODE();
   ASSERT(PropertyRequest);
@@ -741,7 +683,8 @@ Return Value:
 
   NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
 
-  switch (PropertyRequest->PropertyItem->Id) {
+  switch (PropertyRequest->PropertyItem->Id) 
+  {
     case KSPROPERTY_AUDIO_CHANNEL_CONFIG:
     // This miniport will handle channel config property
     // requests.
@@ -757,38 +700,29 @@ Return Value:
   }
 
   return ntStatus;
-} // PropertyHandlerGeneric
+}
 
-//=============================================================================
-NTSTATUS CMiniportWaveCyclic::ValidateFormat(
-    IN  PKSDATAFORMAT           pDataFormat
-)
-/*
-Routine Description:
-  Validates that the given dataformat is valid.
-  This version of the driver supports PCM and
-  WAVEFORMATEXTENSIBLE.
-
-Arguments:
-  pDataFormat - The dataformat for validation.
-
-Return Value:
-  NT status code.
-*/
+/*  Validates that the given dataformat is valid.
+    This version of the driver supports PCM and WAVEFORMATEXTENSIBLE.
+    Arguments:  pDataFormat - The dataformat for validation.. */
+NTSTATUS CMiniportWaveCyclic::ValidateFormat(IN  PKSDATAFORMAT pDataFormat)
 {
   PAGED_CODE();
   ASSERT(pDataFormat);
   //DPF_ENTER(("[CMiniportWaveCyclic::ValidateFormat]"));
 
-  NTSTATUS                    ntStatus = STATUS_INVALID_PARAMETER;
-  PWAVEFORMATEX               pwfx;
+  NTSTATUS ntStatus = STATUS_INVALID_PARAMETER;
+  PWAVEFORMATEX pwfx;
 
   pwfx = GetWaveFormatEx(pDataFormat);
-  if (pwfx) {
-    if (IS_VALID_WAVEFORMATEX_GUID(&pDataFormat->SubFormat)) {
+  if (pwfx) 
+  {
+    if (IS_VALID_WAVEFORMATEX_GUID(&pDataFormat->SubFormat)) 
+    {
       USHORT wfxID = EXTRACT_WAVEFORMATEX_ID(&pDataFormat->SubFormat);
 
-      switch (wfxID) {
+      switch (wfxID)
+      {
         case WAVE_FORMAT_PCM:
 	      switch (pwfx->wFormatTag) 
 		  {
@@ -805,13 +739,15 @@ Return Value:
           //DPF(D_TERSE, ("Invalid format EXTRACT_WAVEFORMATEX_ID!"));
           break;
       }
-    } else {
+    }
+    else
+    {
       //DPF(D_TERSE, ("Invalid pDataFormat->SubFormat!") );
     }
   }
 
   return ntStatus;
-} // ValidateFormat
+}
 
 /*  Given a waveformatex and format size validates that the format is in device
     datarange.
@@ -821,13 +757,11 @@ NTSTATUS CMiniportWaveCyclic::ValidatePcm(IN  PWAVEFORMATEX pWfx)
   PAGED_CODE();
   //DPF_ENTER(("CMiniportWaveCyclic::ValidatePcm"));
 
-  if ( pWfx                                                &&
-      (pWfx->cbSize == 0)                                 &&
-      (pWfx->nChannels >= m_MinChannels)                  &&
-      (pWfx->nChannels <= m_MaxChannelsPcm)               &&
-      (pWfx->nSamplesPerSec >= m_MinSampleRatePcm)        &&
-      (pWfx->nSamplesPerSec <= m_MaxSampleRatePcm)        &&
-      (pWfx->wBitsPerSample >= m_MinBitsPerSamplePcm)     &&
+  if ( pWfx && (pWfx->cbSize == 0) && (pWfx->nChannels >= m_MinChannels) &&
+      (pWfx->nChannels <= m_MaxChannelsPcm) &&
+      (pWfx->nSamplesPerSec >= m_MinSampleRatePcm) &&
+      (pWfx->nSamplesPerSec <= m_MaxSampleRatePcm) &&
+      (pWfx->wBitsPerSample >= m_MinBitsPerSamplePcm) &&
       (pWfx->wBitsPerSample <= m_MaxBitsPerSamplePcm))
   {
       return STATUS_SUCCESS;
@@ -891,10 +825,7 @@ NTSTATUS PropertyHandler_Wave(IN PPCPROPERTY_REQUEST PropertyRequest)
     //DPF_ENTER(("[PropertyHandler_Wave]"));
 
     return ((PCMiniportWaveCyclic)
-        (PropertyRequest->MajorTarget))->PropertyHandlerGeneric
-        (
-            PropertyRequest
-        );
+        (PropertyRequest->MajorTarget))->PropertyHandlerGeneric(PropertyRequest);
 }
 #pragma code_seg()
 
@@ -913,7 +844,8 @@ void TimerNotify(IN PKDPC Dpc, IN  PVOID DeferredContext,
   UNREFERENCED_PARAMETER(SA2);
   PCMiniportWaveCyclic pMiniport = (PCMiniportWaveCyclic) DeferredContext;
 
-  if (pMiniport && pMiniport->m_Port) {
+  if (pMiniport && pMiniport->m_Port)
+  {
       pMiniport->m_Port->Notify(pMiniport->m_ServiceGroup);
   }
 }

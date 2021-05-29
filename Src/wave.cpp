@@ -8,30 +8,9 @@
 
 #pragma code_seg("PAGE")
 
-//=============================================================================
-// CMiniportWaveCyclic
-//=============================================================================
-
-//=============================================================================
-NTSTATUS CreateMiniportWaveCyclic( 
-  OUT PUNKNOWN *              Unknown,
-  IN  REFCLSID,
-  IN  PUNKNOWN                UnknownOuter OPTIONAL,
-  IN  POOL_TYPE               PoolType 
-)
-/*
-Routine Description:
-  Create the wavecyclic miniport.
-
-Arguments:
-  Unknown - 
-  RefClsId -
-  UnknownOuter -
-  PoolType -
-
-Return Value:
-  NT status code.
-*/
+// Create the wavecyclic miniport.
+NTSTATUS CreateMiniportWaveCyclic(OUT PUNKNOWN * Unknown, IN  REFCLSID,
+               IN PUNKNOWN UnknownOuter OPTIONAL, IN POOL_TYPE PoolType)
 {
   PAGED_CODE();
   ASSERT(Unknown);
@@ -39,7 +18,6 @@ Return Value:
   STD_CREATE_BODY(CMiniportWaveCyclic, Unknown, UnknownOuter, PoolType);
 }
 
-//=============================================================================
 CMiniportWaveCyclic::CMiniportWaveCyclic(PUNKNOWN pUnknownOuter):CUnknown( pUnknownOuter )
 {
 	PAGED_CODE();
@@ -55,17 +33,9 @@ CMiniportWaveCyclic::CMiniportWaveCyclic(PUNKNOWN pUnknownOuter):CUnknown( pUnkn
 	m_NotificationInterval = 0; 
 	m_SamplingFrequency = 0; 
 }
-//=============================================================================
+
+// Destructor for wavecyclic miniport
 CMiniportWaveCyclic::~CMiniportWaveCyclic(void)
-/*
-Routine Description:
-  Destructor for wavecyclic miniport
-
-Arguments:
-
-Return Value:
-  NT status code.
-*/
 {
   PAGED_CODE();
   //DPF_ENTER(("[CMiniportWaveCyclic::~CMiniportWaveCyclic]"));
@@ -78,7 +48,7 @@ Return Value:
 
   if (m_AdapterCommon)
       m_AdapterCommon->Release();
-  ////
+  
   	if (m_pvTranBuf)
 	{
 		ExFreePool( m_pvTranBuf );
@@ -90,49 +60,33 @@ Return Value:
 
 }
 
-
-//=============================================================================
+/*  The DataRangeIntersection function determines the highest quality
+    intersection of two data ranges.
+    Arguments: PinId - Pin for which data intersection is being determined.
+               ClientDataRange - Pointer to KSDATARANGE structure which contains the data
+                                 range submitted by client in the data range intersection
+                                 property request.
+               MyDataRange -     Pin's data range to be compared with client's data
+                                 range. In this case we actually ignore our own data
+                                 range, because we know that we only support one range.
+               OutputBufferLength -  Size of the buffer pointed to by the resultant format
+                                     parameter.
+               ResultantFormat -     Pointer to value where the resultant format should be
+                                     returned.
+               ResultantFormatLength -   Actual length of the resultant format placed in
+                                         ResultantFormat. This should be less than or equal
+                                         to OutputBufferLength. */
 STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::DataRangeIntersection( 
-  IN  ULONG                       PinId,
-  IN  PKSDATARANGE                ClientDataRange,
-  IN  PKSDATARANGE                MyDataRange,
-  IN  ULONG                       OutputBufferLength,
-  OUT PVOID                       ResultantFormat,
-  OUT PULONG                      ResultantFormatLength 
-)
-/*
-Routine Description:
-  The DataRangeIntersection function determines the highest quality 
-  intersection of two data ranges.
-
-Arguments:
-  PinId -           Pin for which data intersection is being determined. 
-  ClientDataRange - Pointer to KSDATARANGE structure which contains the data 
-                    range submitted by client in the data range intersection 
-                    property request. 
-  MyDataRange -         Pin's data range to be compared with client's data 
-                        range. In this case we actually ignore our own data 
-                        range, because we know that we only support one range.
-  OutputBufferLength -  Size of the buffer pointed to by the resultant format 
-                        parameter. 
-  ResultantFormat -     Pointer to value where the resultant format should be 
-                        returned. 
-  ResultantFormatLength -   Actual length of the resultant format placed in 
-                            ResultantFormat. This should be less than or equal 
-                            to OutputBufferLength. 
-
-Return Value:
-    NT status code.
-*/
+  IN  ULONG PinId, IN PKSDATARANGE ClientDataRange,
+  IN  PKSDATARANGE MyDataRange, IN ULONG OutputBufferLength,
+  OUT PVOID ResultantFormat, OUT PULONG ResultantFormatLength )
 {
-  UNREFERENCED_PARAMETER(PinId);
-  PAGED_CODE();
-// This code is the same as AC97 sample intersection handler.
-    //
+    UNREFERENCED_PARAMETER(PinId);
+    PAGED_CODE();
+    // This code is the same as AC97 sample intersection handler.
 
     // Check the size of output buffer. Note that we are returning
     // WAVEFORMATPCMEX.
-    //
     if (!OutputBufferLength) 
     {
         *ResultantFormatLength = sizeof(KSDATAFORMAT) + sizeof(WAVEFORMATPCMEX);
@@ -268,21 +222,13 @@ Return Value:
 
 } // DataRangeIntersection
 
-//=============================================================================
+/*  The GetDescription function gets a pointer to a filter description.
+    It provides a location to deposit a pointer in miniport's description
+    structure. This is the placeholder for the FromNode or ToNode fields in
+    connections which describe connections to the filter's pins.
+
+    Arguments: OutFilterDescriptor - Pointer to the filter description. */
 STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::GetDescription(OUT PPCFILTER_DESCRIPTOR * OutFilterDescriptor)
-/*
-Routine Description:
-  The GetDescription function gets a pointer to a filter description. 
-  It provides a location to deposit a pointer in miniport's description 
-  structure. This is the placeholder for the FromNode or ToNode fields in 
-  connections which describe connections to the filter's pins. 
-
-Arguments:
-  OutFilterDescriptor - Pointer to the filter description. 
-
-Return Value:
-  NT status code.
-*/
 {
   PAGED_CODE();
   ASSERT(OutFilterDescriptor);
@@ -290,7 +236,7 @@ Return Value:
   
   *OutFilterDescriptor = m_FilterDescriptor;
    return (STATUS_SUCCESS);
-} // GetDescription
+}
 
 //=============================================================================
 STDMETHODIMP_(NTSTATUS) CMiniportWaveCyclic::Init( 
@@ -552,22 +498,12 @@ Return Value:
   }
 
   return STATUS_INVALID_PARAMETER;
-} // NonDelegatingQueryInterface
+}
 #if 0
-//=============================================================================
+// Handles KSPROPERTY_GENERAL_COMPONENTID
+
 NTSTATUS CMiniportWaveCyclic::PropertyHandlerComponentId(
-  IN PPCPROPERTY_REQUEST      PropertyRequest
-)
-/*
-Routine Description:
-  Handles KSPROPERTY_GENERAL_COMPONENTID
-
-Arguments:
-  PropertyRequest - 
-
-Return Value:
-  NT status code.
-*/
+  IN PPCPROPERTY_REQUEST      PropertyRequest)
 {
   PAGED_CODE();
   DPF_ENTER(("[PropertyHandlerComponentId]"));
@@ -640,10 +576,7 @@ Return Value:
 
 //=============================================================================
 NTSTATUS                    
-CMiniportWaveCyclic::PropertyHandlerChannelConfig
-(
-    IN  PPCPROPERTY_REQUEST     PropertyRequest
-)
+CMiniportWaveCyclic::PropertyHandlerChannelConfig(IN  PPCPROPERTY_REQUEST PropertyRequest)
 /*++
 
 Routine Description:
@@ -880,21 +813,10 @@ Return Value:
   return ntStatus;
 } // ValidateFormat
 
-//=============================================================================
-NTSTATUS CMiniportWaveCyclic::ValidatePcm(
-    IN  PWAVEFORMATEX           pWfx
-)
-/*
-Routine Description:
-  Given a waveformatex and format size validates that the format is in device
-  datarange.
-
-Arguments:
-  pWfx - wave format structure.
-
-Return Value:
-    NT status code.
-*/
+/*  Given a waveformatex and format size validates that the format is in device
+    datarange.
+    Arguments: pWfx - wave format structure.*/
+NTSTATUS CMiniportWaveCyclic::ValidatePcm(IN  PWAVEFORMATEX pWfx)
 {
   PAGED_CODE();
   //DPF_ENTER(("CMiniportWaveCyclic::ValidatePcm"));
@@ -913,40 +835,21 @@ Return Value:
 
   //DPF(D_TERSE, ("Invalid PCM format"));
   return STATUS_INVALID_PARAMETER;
-} // ValidatePcm
+}
 
-//=============================================================================
-NTSTATUS
-CMiniportWaveCyclic::ValidateWfxExt
-(
-    IN  PWAVEFORMATEXTENSIBLE   pWfxExt
-)
-/*++
-
-Routine Description:
-
-  Given a waveformatextensible, verifies that the format is in device
-  datarange.  Note that the driver assumes that
-  all values within the minimum and maximum values for sample rate, 
-  bit depth, and channel count are valid as opposed to just discrete
-  values.
-
-Arguments:
-
-  pWfxExt - wave format extensible structure
-
-Return Value:
-    
-    NT status code.
-
---*/
+/* Given a waveformatextensible, verifies that the format is in device
+   datarange.  Note that the driver assumes that
+   all values within the minimum and maximum values for sample rate,
+   bit depth, and channel count are valid as opposed to just discrete
+   values.
+   Arguments:  pWfxExt - wave format extensible structure */
+NTSTATUS CMiniportWaveCyclic::ValidateWfxExt(IN PWAVEFORMATEXTENSIBLE pWfxExt)
 {
     PAGED_CODE();
 
     //DPF_ENTER(("[CMiniportWaveCyclic::ValidateWfxExtPcm]"));
 
     // First verify that the subformat is OK
-    //
     if (pWfxExt)
     {
         if(IsEqualGUIDAligned(pWfxExt->SubFormat, KSDATAFORMAT_SUBTYPE_PCM))
@@ -975,30 +878,11 @@ Return Value:
     //DPF(D_TERSE, ("Invalid PCM format"));
 
     return STATUS_INVALID_PARAMETER;
-} // ValidateWfxExtPcm
+}
 
 
-//=============================================================================
-NTSTATUS
-PropertyHandler_Wave
-( 
-    IN PPCPROPERTY_REQUEST      PropertyRequest 
-)
-/*++
-
-Routine Description:
-
-  Redirects property request to miniport object
-
-Arguments:
-
-  PropertyRequest  
-
-Return Value:
-
-  NT status code.
-
---*/
+// Redirects property request to miniport object
+NTSTATUS PropertyHandler_Wave(IN PPCPROPERTY_REQUEST PropertyRequest)
 {
     PAGED_CODE();
 
@@ -1011,31 +895,18 @@ Return Value:
         (
             PropertyRequest
         );
-} // PropertyHandler_Topology
+}
 #pragma code_seg()
 
-//=============================================================================
-void TimerNotify(
-  IN  PKDPC                   Dpc,
-  IN  PVOID                   DeferredContext,
-  IN  PVOID                   SA1,
-  IN  PVOID                   SA2
-)
-/*
-Routine Description:
-  Dpc routine. This simulates an interrupt service routine. The Dpc will be
-  called whenever CMiniportWaveCyclicStreamMSVAD::m_pTimer triggers.
-
-Arguments:
-  Dpc - the Dpc object
-  DeferredContext - Pointer to a caller-supplied context to be passed to
-                    the DeferredRoutine when it is called
-  SA1 - System argument 1
-  SA2 - System argument 2
-
-Return Value:
-  NT status code.
-*/
+/*  Dpc routine. This simulates an interrupt service routine. The Dpc will be
+    called whenever CMiniportWaveCyclicStreamMSVAD::m_pTimer triggers.
+    Arguments: Dpc - the Dpc object
+               DeferredContext - Pointer to a caller-supplied context to be passed to
+                                 the DeferredRoutine when it is called
+               SA1 - System argument 1
+               SA2 - System argument 2 */
+void TimerNotify(IN PKDPC Dpc, IN  PVOID DeferredContext,
+  IN  PVOID SA1, IN PVOID SA2)
 {
   UNREFERENCED_PARAMETER(Dpc);
   UNREFERENCED_PARAMETER(SA1);
@@ -1045,5 +916,5 @@ Return Value:
   if (pMiniport && pMiniport->m_Port) {
       pMiniport->m_Port->Notify(pMiniport->m_ServiceGroup);
   }
-} // TimerNotify
+}
 

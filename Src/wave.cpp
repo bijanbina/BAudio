@@ -836,8 +836,7 @@ NTSTATUS PropertyHandler_Wave(IN PPCPROPERTY_REQUEST PropertyRequest)
                                  the DeferredRoutine when it is called
                SA1 - System argument 1
                SA2 - System argument 2 */
-void TimerNotify(IN PKDPC Dpc, IN  PVOID DeferredContext,
-  IN  PVOID SA1, IN PVOID SA2)
+void TimerNotify(IN PKDPC Dpc, IN  PVOID DeferredContext, IN PVOID SA1, IN PVOID SA2)
 {
   UNREFERENCED_PARAMETER(Dpc);
   UNREFERENCED_PARAMETER(SA1);

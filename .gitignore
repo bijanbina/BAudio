@@ -2,3 +2,5 @@
 *.user
 
 .vs/BAudio/v16/
+
+x64/Debug/

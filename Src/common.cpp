@@ -4,6 +4,7 @@
 #include "common.h"
 #include "hw.h"
 #include "adapter_common.h"
+//#include <new>
 
 #pragma code_seg("PAGE")
 // Creates a new CAdapterCommon
@@ -12,8 +13,23 @@ NTSTATUS NewAdapterCommon(OUT PUNKNOWN *Unknown, IN REFCLSID,
 {
 	PAGED_CODE();
 	ASSERT(Unknown);
+    NTSTATUS ntStatus;
+    ULONG64               PoolFlags;
+	//STD_CREATE_BODY_(CAdapterCommon, Unknown, UnknownOuter, PoolType, PADAPTERCOMMON);
+    //STD_CREATE_BODY_WITH_TAG_(CAdapterCommon, Unknown, UnknownOuter, PoolType, 'rCcP', PADAPTERCOMMON);
 
-	STD_CREATE_BODY_(CAdapterCommon, Unknown, UnknownOuter, PoolType, PADAPTERCOMMON);
+    CAdapterCommon *p = new CAdapterCommon(UnknownOuter);
+    if (p)
+    {
+        *Unknown = PUNKNOWN((PADAPTERCOMMON)(p));
+        (*Unknown)->AddRef();
+        ntStatus = STATUS_SUCCESS;
+    }
+    else
+    {
+        ntStatus = STATUS_INSUFFICIENT_RESOURCES;
+    }
+    return ntStatus;
 } 
 
 CAdapterCommon::CAdapterCommon(PUNKNOWN pUnknownOuter):CUnknown( pUnknownOuter )

@@ -185,6 +185,7 @@
       <WppRecorderEnabled>true</WppRecorderEnabled>
       <WppScanConfigurationData Condition="'%(ClCompile.ScanConfigurationData)' == ''">trace.h</WppScanConfigurationData>
       <WppKernelMode>true</WppKernelMode>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_USE_WAVERT_;_USE_IPortClsRuntimePower;_NEW_DELETE_OPERATORS_;_WIN32_WINNT=0x0601</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);usbdex.lib;ntstrsafe.lib</AdditionalDependencies>

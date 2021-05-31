@@ -80,7 +80,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="Src\vrtaupipe.inx">
+    <Inf Include="Src\baudio.inx">
       <Filter>Driver Files</Filter>
     </Inf>
   </ItemGroup>

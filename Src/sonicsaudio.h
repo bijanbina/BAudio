@@ -9,6 +9,8 @@ Abstract:
 #ifndef __SONICSAUDIO_H_
 #define __SONICSAUDIO_H_
 
+#define PC_IMPLEMENTATION
+
 #include <portcls.h>
 #include <stdunk.h>
 #include <ksdebug.h>

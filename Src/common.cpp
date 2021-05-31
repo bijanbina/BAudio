@@ -4,6 +4,7 @@
 #include "common.h"
 #include "hw.h"
 #include "adapter_common.h"
+#include "new_delete.h"
 //#include <new>
 
 #pragma code_seg("PAGE")
@@ -14,11 +15,11 @@ NTSTATUS NewAdapterCommon(OUT PUNKNOWN *Unknown, IN REFCLSID,
 	PAGED_CODE();
 	ASSERT(Unknown);
     NTSTATUS ntStatus;
-    ULONG64               PoolFlags;
+    //ULONG64               PoolFlags;
 	//STD_CREATE_BODY_(CAdapterCommon, Unknown, UnknownOuter, PoolType, PADAPTERCOMMON);
     //STD_CREATE_BODY_WITH_TAG_(CAdapterCommon, Unknown, UnknownOuter, PoolType, 'rCcP', PADAPTERCOMMON);
 
-    CAdapterCommon *p = new CAdapterCommon(UnknownOuter);
+    CAdapterCommon *p = new(PoolType, 'rCcP') CAdapterCommon(UnknownOuter);
     if (p)
     {
         *Unknown = PUNKNOWN((PADAPTERCOMMON)(p));

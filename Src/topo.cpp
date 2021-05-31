@@ -5,6 +5,7 @@
 #include "wave.h"
 #include "topo.h"
 #include "toptable.h"
+#include "new_delete.h"
 
 /*********************************************************************
 * Topology/Wave bridge connection                                    *
@@ -40,7 +41,7 @@ NTSTATUS CreateMiniportTopology( OUT PUNKNOWN *Unknown, IN REFCLSID,
 }
 
 //Redirects property request to miniport object
-NTSTATUS PropertyHandler_Topology ( IN PPCPROPERTY_REQUEST PropertyRequest)
+NTSTATUS PropertyHandler_Topology(IN PPCPROPERTY_REQUEST PropertyRequest)
 {
   PAGED_CODE();
   ASSERT(PropertyRequest);

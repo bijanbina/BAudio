@@ -1,19 +1,11 @@
-/*
-Module Name:
-     wavestream.h
-
-Abstract:
-    Definition of wavecyclic miniport class.
-*/
+// Definition of wavecyclic miniport class.
 
 #ifndef __WAVESTREAM_H_
 #define __WAVESTREAM_H_
 
 #include "wave.h"
 
-///////////////////////////////////////////////////////////////////////////////
 // CMiniportWaveCyclicStream 
-//   
 
 class CMiniportWaveCyclicStream : public IMiniportWaveCyclicStream, public IDmaChannel, public CUnknown {
 protected:
@@ -40,34 +32,29 @@ protected:
 public:
     DECLARE_STD_UNKNOWN();
     //DEFINE_STD_CONSTRUCTOR(CMiniportWaveCyclicStream);
-	CMiniportWaveCyclicStream( PUNKNOWN pUnknownOuter);
+	CMiniportWaveCyclicStream(PUNKNOWN pUnknownOuter);
     ~CMiniportWaveCyclicStream();
 
 	IMP_IMiniportWaveCyclicStream;
     IMP_IDmaChannel;
 
-    NTSTATUS Init
-    ( 
-        IN  PCMiniportWaveCyclic Miniport,
-        IN  ULONG               Channel,
-        IN  BOOLEAN             Capture,
-        IN  PKSDATAFORMAT       DataFormat
-    );
+    NTSTATUS Init(IN  PCMiniportWaveCyclic Miniport,
+        IN ULONG Channel,IN BOOLEAN Capture, IN PKSDATAFORMAT DataFormat);
 
     // Friends
     friend class CMiniportWaveCyclic;
-    STDMETHOD_(NTSTATUS __stdcall, AllocateBuffer)(IN ULONG BufferSize, IN PPHYSICAL_ADDRESS PhysicalAddressConstraint OPTIONAL);
-    STDMETHOD_(ULONG __stdcall, AllocatedBufferSize)(void);
-    STDMETHOD_(ULONG __stdcall, BufferSize)(void);
-    STDMETHOD_(void __stdcall, CopyFrom)(IN PVOID Destination, IN PVOID Source, IN ULONG ByteCount);
-    STDMETHOD_(void __stdcall, CopyTo)(IN PVOID Destination, IN PVOID Source, IN ULONG ByteCount);
-    STDMETHOD_(void __stdcall, FreeBuffer)(void);
-    STDMETHOD_(PADAPTER_OBJECT __stdcall, GetAdapterObject)(void);
-    STDMETHOD_(ULONG __stdcall, MaximumBufferSize)(void);
-    STDMETHOD_(PHYSICAL_ADDRESS __stdcall, PhysicalAddress)(void);
-    STDMETHOD_(void __stdcall, SetBufferSize)(IN ULONG BufferSize);
-    STDMETHOD_(PVOID __stdcall, SystemAddress)(void);
-    STDMETHOD_(ULONG __stdcall, TransferCount)(void);
+    //STDMETHOD_(NTSTATUS __stdcall, AllocateBuffer)(IN ULONG BufferSize, IN PPHYSICAL_ADDRESS PhysicalAddressConstraint OPTIONAL);
+    //STDMETHOD_(ULONG __stdcall, AllocatedBufferSize)(void);
+    //STDMETHOD_(ULONG __stdcall, BufferSize)(void);
+    //STDMETHOD_(void __stdcall, CopyFrom)(IN PVOID Destination, IN PVOID Source, IN ULONG ByteCount);
+    //STDMETHOD_(void __stdcall, CopyTo)(IN PVOID Destination, IN PVOID Source, IN ULONG ByteCount);
+    //STDMETHOD_(void __stdcall, FreeBuffer)(void);
+    //STDMETHOD_(PADAPTER_OBJECT __stdcall, GetAdapterObject)(void);
+    //STDMETHOD_(ULONG __stdcall, MaximumBufferSize)(void);
+    //STDMETHOD_(PHYSICAL_ADDRESS __stdcall, PhysicalAddress)(void);
+    //STDMETHOD_(void __stdcall, SetBufferSize)(IN ULONG BufferSize);
+    //STDMETHOD_(PVOID __stdcall, SystemAddress)(void);
+    //STDMETHOD_(ULONG __stdcall, TransferCount)(void);
 };
 typedef CMiniportWaveCyclicStream *PCMiniportWaveCyclicStream;
 

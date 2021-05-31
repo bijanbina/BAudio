@@ -4,20 +4,20 @@ Class       = MEDIA
 Provider    = %ProviderName%
 ClassGUID   = {4d36e96c-e325-11ce-bfc1-08002be10318}
 DriverVer = 02/22/2007, 6.0.6000.1
-CatalogFile = VAT.cat
+CatalogFile = BAudio.cat
 PnpLockDown = 1
 
 [SourceDisksNames]
 222="SONICS Driver Disk","",222
 
 [SourceDisksFiles]
-vrtaupipe.sys=222
+BAudio.sys=222
 
 [Manufacturer]
 %MfgName%=SonicsDeviceSection,NT$ARCH$
 
 [SignatureAttributes]
-simpleaudiosample.sys=SignatureAttributes.DRM
+BAudio.sys=SignatureAttributes.DRM
 
 [SignatureAttributes.DRM]
 DRMLevel=1300
@@ -34,11 +34,11 @@ SONICS_WaveExtensible.CopyList=10,system32\drivers
 ; SONICS_WaveExtensible
 ;======================================================
 [SONICS_WaveExtensible.CopyList]
-vrtaupipe.sys
+BAudio.sys
 
 [SONICS_WaveExtensible.AddReg]
 HKR,,AssociatedFilters,,"wdmaud,redbook"
-HKR,,Driver,,vrtaupipe.sys
+HKR,,Driver,,BAudio.sys
 
 HKR,Drivers,SubClasses,,"wave,mixer"
 
@@ -86,7 +86,7 @@ DisplayName=%sonics_WaveExtensible.SvcDesc%
 ServiceType=1
 StartType=3
 ErrorControl=1
-ServiceBinary=%10%\system32\drivers\vrtaupipe.sys
+ServiceBinary=%10%\system32\drivers\BAudio.sys
 
 ;======================================================
 ; COMMON

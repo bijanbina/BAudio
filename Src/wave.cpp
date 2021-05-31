@@ -5,6 +5,7 @@
 #include "wave.h"
 #include "wavestream.h"
 #include "wavtable.h"
+#include "new_delete.h"
 
 #pragma code_seg("PAGE")
 // Create the wavecyclic miniport.

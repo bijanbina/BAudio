@@ -93,12 +93,12 @@ ServiceBinary=%10%\system32\drivers\BAudio.sys
 ;======================================================
 [Strings]
 ProviderName = "Binaee.com"
-SONICS="Sonics"
-MfgName="Sonics Audio DDK"
-SONICS_WaveExtensible.DeviceDesc="Sonics Virtual Audio Device (Wave Extensible) (WDM)"
+SONICS="Binaee"
+MfgName="Bijan Audio"
+SONICS_WaveExtensible.DeviceDesc="Bijan Virtual Audio Device"
 
-SONICS.Wave.szPname="SONICS Wave"
-SONICS.Topo.szPname="SONICS Topology"
+SONICS.Wave.szPname="Bijan Audio"
+SONICS.Topo.szPname="Bijan Technology"
 
 Proxy.CLSID="{17CCA71B-ECD7-11D0-B908-00A0C9223196}"
 KSCATEGORY_AUDIO="{6994AD04-93EF-11D0-A3CC-00A0C9223196}"
@@ -108,7 +108,7 @@ KSCATEGORY_CAPTURE="{65E8773D-8F56-11D0-A3B9-00A0C9223196}"
 KSNAME_Wave="Wave"
 KSNAME_Topology="Topology"
 
-SONICS_WaveExtensible.SvcDesc="Sonics Virtual Audio Device (Wave Extensible) (WDM)"
+SONICS_WaveExtensible.SvcDesc="Bijan Virtual Audio Device"
 
 
 

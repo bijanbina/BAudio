@@ -4,7 +4,7 @@ BAudio is built upon WDK 10.0.19041, Visual Studio 2019 and is a KMDF driver.
 
 ## Installation
 ### Enable Test Signing
-If you know how I can sign this driver please contact with me, For the time being to use woithout signing enable test signing in the cmd with
+If you know how I can sign this driver please contact me, For the time being to use without signing, enable test signing in the cmd with
 ```
 bcdedit /set testsigning on
 ```
@@ -14,3 +14,7 @@ bcdedit /set testsigning on
 2. From Menubar: `Action > Add legacy hardware`
 3. Select `Install the hardware that I manually select ...`
 4. Click `Have Disk` and Browser for the inf file
+
+### Supported Platform
+- Windows 7 64bit
+- Windows 10 64bit
